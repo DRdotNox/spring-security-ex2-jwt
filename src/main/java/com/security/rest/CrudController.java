@@ -2,6 +2,7 @@ package com.security.rest;
 
 import com.security.model.AppUser;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -25,23 +26,27 @@ public class CrudController {
     );
 
     @GetMapping("/all")
+    @PreAuthorize("hasAnyRole('ROLE_USER', 'ROLE_MODERATOR')")
     public ResponseEntity<List<AppUser>> findAllUsers(){
 
         return ResponseEntity.ok(USERS);
     }
     @PostMapping("/create")
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<String> createUser(@RequestBody AppUser user){
 
         return ResponseEntity.ok("userCreated");
     }
 
     @DeleteMapping("/delete")
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<String> deleteUser(@RequestParam String id){
 
         return ResponseEntity.ok("user deleted");
     }
 
     @PutMapping("/update")
+    @PreAuthorize("hasAuthority('user:write')")
     public ResponseEntity<String> update(@RequestParam String id, @RequestBody AppUser user) {
 
         return ResponseEntity.ok("user created");
