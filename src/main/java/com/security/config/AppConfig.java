@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 import static com.security.UserRoles.*;
 
@@ -35,7 +36,8 @@ public class AppConfig  extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
-        http.csrf().disable();
+        http.csrf()
+                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()); //фактори, что собирает и добавляет в кукис csrf токен
 
         http
 
@@ -44,10 +46,6 @@ public class AppConfig  extends WebSecurityConfigurerAdapter {
                 .permitAll()
                 .antMatchers("/api/v1/admin/**")
                 .hasRole(ADMIN.name())
-//                .antMatchers(HttpMethod.DELETE, "/api/v1/user/**").hasAuthority(UserPermissions.USER_WRITE.getPermission())
-//                .antMatchers(HttpMethod.POST, "/api/v1/user/**").hasAuthority(UserPermissions.USER_WRITE.getPermission())
-//                .antMatchers(HttpMethod.PUT, "/api/v1/user/**").hasAuthority(UserPermissions.USER_WRITE.getPermission())
-//                .antMatchers(HttpMethod.GET, "/api/v1/user/**").hasAnyRole(USER.name(), MODERATOR.name())
                 .anyRequest()
                 .authenticated()
                 .and()
