@@ -1,13 +1,8 @@
 package com.security.config.security;
 
 
-import com.security.UserPermissions;
-import com.security.UserRoles;
-import com.security.config.security.filter.CustomFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
-import org.springframework.lang.UsesSunMisc;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -17,12 +12,11 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
-import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
-import java.util.Base64;
-
-import static com.security.UserRoles.*;
+import static com.security.UserRoles.ADMIN;
+import static com.security.UserRoles.MODERATOR;
+import static com.security.UserRoles.USER;
 
 
 /* до  02.21.2022 (v5.7.0-M2)  */
