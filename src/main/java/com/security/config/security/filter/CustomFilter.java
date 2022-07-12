@@ -1,6 +1,7 @@
 package com.security.config.security.filter;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -13,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@Order(0)
 @Slf4j
 public class CustomFilter extends GenericFilterBean {
 
