@@ -1,8 +1,9 @@
-package com.security.config;
+package com.security.config.security;
 
 
 import com.security.UserPermissions;
 import com.security.UserRoles;
+import com.security.config.security.filter.CustomFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,7 +17,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+
+import java.util.Base64;
 
 import static com.security.UserRoles.*;
 
@@ -25,7 +29,7 @@ import static com.security.UserRoles.*;
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true) // ???
-public class AppConfig  extends WebSecurityConfigurerAdapter {
+public class AppConfig extends WebSecurityConfigurerAdapter {
 
 
     @Bean
@@ -36,7 +40,16 @@ public class AppConfig  extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
 
+
+        http
+            .headers()
+                .xssProtection()
+                .and()
+                .contentSecurityPolicy("script-src 'self'");
+
+
         http.csrf()
+
                 .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()); //фактори, что собирает и добавляет в кукис csrf токен
 
         http
@@ -50,6 +63,9 @@ public class AppConfig  extends WebSecurityConfigurerAdapter {
                 .authenticated()
                 .and()
                 .httpBasic();
+
+//        http.addFilterBefore(new CustomFilter(), BasicAuthenticationFilter.class);
+
 
     }
 
@@ -85,11 +101,6 @@ public class AppConfig  extends WebSecurityConfigurerAdapter {
 
     }
 }
-
-
-
-
-
 
 
 ///* после  02.21.2022 (v5.7.0-M2)  */
