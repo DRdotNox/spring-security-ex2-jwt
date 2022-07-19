@@ -35,30 +35,20 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.httpBasic().disable();
-        http.authorizeRequests()
-                .antMatchers("/api/v1/auth")
-                .permitAll()
-                .anyRequest()
-                .authenticated();
-        http.csrf().disable();
-        http.sessionManagement()
+
+        http
+                .cors().disable()
+                .csrf().disable();
+
+        http
+                .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new JwtUsernamePasswordAuthFilter(authenticationManager())); // authenticationManager получается от WebSecurityConfigurerAdapter
-
-
-//        http
-//            .headers()
-//                .xssProtection()
-//                .and()
-//                .contentSecurityPolicy("script-src 'self'");
-//
-//        http.csrf()
-//                .csrfTokenRepository(
-//                        CookieCsrfTokenRepository.withHttpOnlyFalse()); //фактори, что собирает и добавляет в кукис csrf токен
-
-
+                .addFilter(new JwtUsernamePasswordAuthFilter(authenticationManager()))
+                .authorizeRequests()
+                .antMatchers("/").permitAll()
+                .anyRequest()
+                .authenticated();
     }
 
     @Bean
