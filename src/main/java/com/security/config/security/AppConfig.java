@@ -1,12 +1,14 @@
 package com.security.config.security;
 
 
+import com.security.config.security.jwt.JwtUsernamePasswordAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -33,32 +35,28 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-
-
-        http
-            .headers()
-                .xssProtection()
-                .and()
-                .contentSecurityPolicy("script-src 'self'");
-
-
-        http.csrf()
-
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()); //фактори, что собирает и добавляет в кукис csrf токен
-
-        http
-
-                .authorizeRequests()
-                .antMatchers("/api/v1/public/**")
+        http.httpBasic().disable();
+        http.authorizeRequests()
+                .antMatchers("/api/v1/auth")
                 .permitAll()
-                .antMatchers("/api/v1/admin/**")
-                .hasRole(ADMIN.name())
                 .anyRequest()
-                .authenticated()
+                .authenticated();
+        http.csrf().disable();
+        http.sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .httpBasic();
+                .addFilter(new JwtUsernamePasswordAuthFilter(authenticationManager())); // authenticationManager получается от WebSecurityConfigurerAdapter
 
-//        http.addFilterBefore(new CustomFilter(), BasicAuthenticationFilter.class);
+
+//        http
+//            .headers()
+//                .xssProtection()
+//                .and()
+//                .contentSecurityPolicy("script-src 'self'");
+//
+//        http.csrf()
+//                .csrfTokenRepository(
+//                        CookieCsrfTokenRepository.withHttpOnlyFalse()); //фактори, что собирает и добавляет в кукис csrf токен
 
 
     }
