@@ -4,6 +4,7 @@ package com.security.config.security;
 import com.security.config.security.jwt.JwtUsernamePasswordAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -24,8 +25,9 @@ import static com.security.UserRoles.USER;
 /* до  02.21.2022 (v5.7.0-M2)  */
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true) // ???
+//@EnableGlobalMethodSecurity(prePostEnabled = true) // ???
 public class AppConfig extends WebSecurityConfigurerAdapter {
+
 
 
     @Bean
@@ -44,11 +46,14 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
-                .addFilter(new JwtUsernamePasswordAuthFilter(authenticationManager()))
+                .addFilter(new JwtUsernamePasswordAuthFilter(this.authenticationManager()))
                 .authorizeRequests()
                 .antMatchers("/").permitAll()
                 .anyRequest()
-                .authenticated();
+                .authenticated()
+        ;
+
+
     }
 
     @Bean

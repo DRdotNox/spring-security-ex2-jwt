@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -18,14 +19,22 @@ import java.io.IOException;
 import java.sql.Date;
 import java.time.LocalDate;
 
-@RequiredArgsConstructor
+
 public class JwtUsernamePasswordAuthFilter extends UsernamePasswordAuthenticationFilter {
 
-    private final AuthenticationManager authManager;
+    private AuthenticationManager authManager;
+
+    @Autowired
+    public JwtUsernamePasswordAuthFilter(AuthenticationManager authManager) {
+        this.authManager = authManager;
+    }
+
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request,
                                                 HttpServletResponse response) throws AuthenticationException {
+
+        System.out.println(authManager);
 
         try {
             UsernamePasswordAuthRequest authRequest = new ObjectMapper()
