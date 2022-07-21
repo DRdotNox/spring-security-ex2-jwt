@@ -15,8 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/")
-
+@RequestMapping("/api/v1")
 public class AuthController {
 
     private final UserDetailsService userDetailsService;
@@ -28,12 +27,8 @@ public class AuthController {
 
     @PostMapping("/auth")
     public ResponseEntity<?> authenticate(@RequestBody UsernamePasswordAuthRequest request) {
-        try {
-            userDetailsService.loadUserByUsername(request.getUsername());
 
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.ok().build();
-        }
+        userDetailsService.loadUserByUsername(request.getUsername());
         return ResponseEntity.ok().build();
     }
 }
