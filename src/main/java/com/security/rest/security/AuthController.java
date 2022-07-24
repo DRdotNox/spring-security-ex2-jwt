@@ -1,4 +1,4 @@
-package com.security.rest;
+package com.security.rest.security;
 
 
 import com.security.config.security.jwt.UsernamePasswordAuthRequest;
@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.NoSuchElementException;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping("/api/v1/auth")
 public class AuthController {
 
     private final UserDetailsService userDetailsService;
@@ -25,7 +25,7 @@ public class AuthController {
         this.userDetailsService = userDetailsService;
     }
 
-    @PostMapping("/auth")
+    @PostMapping()
     public ResponseEntity<?> authenticate(@RequestBody UsernamePasswordAuthRequest request) {
 
         userDetailsService.loadUserByUsername(request.getUsername());
