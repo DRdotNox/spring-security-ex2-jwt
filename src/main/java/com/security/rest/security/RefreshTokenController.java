@@ -2,9 +2,11 @@ package com.security.rest.security;
 
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.security.util.ClaimsUtil;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -31,63 +33,40 @@ import java.util.Map;
 @RequestMapping("/api/v1/refresh_token")
 public class RefreshTokenController {
 
-    private final String secretKey = "reallySecureKeyreallySecureKeyreallySecureKeyreallySecureKey";
+    @Value(value = "${secretKey}")
+    private String secretKey;
 
+    @Value(value = "${accessTokenHeader}")
+    private String accessTokenHeader;
 
-    private final UserDetailsService userDetailsService;
+    @Value(value = "${refreshTokenHeader}")
+    private String refreshTokenHeader;
 
-    @Autowired
-    public RefreshTokenController(UserDetailsService userDetailsService) {
-        this.userDetailsService = userDetailsService;
-    }
+    @Value(value = "${bearer}")
+    private String bearer;
 
     @PostMapping
     public ResponseEntity refresh(HttpServletRequest request, HttpServletResponse response) throws IOException {
 
-        String authHeader = request.getHeader("X-Refresh-Token");
-        if (authHeader == null || !authHeader.startsWith("Bearer")) {
+        String authHeader = request.getHeader(accessTokenHeader);
+        if (authHeader == null || !authHeader.startsWith(bearer)) {
             throw new RuntimeException("Refresh token is missing");
         }
 
-        Claims claims = extractClaims(authHeader);
+        Claims claims = ClaimsUtil.extractClaims(authHeader);
 
-        response.setHeader("X-Refresh-Token", generateRefreshToken(claims));
-        response.setHeader("X-Access_Token", generateAccessToken(claims));
-
+        response.setHeader(refreshTokenHeader, generateRefreshToken(claims));
+        response.setHeader(accessTokenHeader, generateAccessToken(claims));
         return ResponseEntity.ok().build();
 
-    }
-
-    private Claims extractClaims(String authorizationHeader) {
-        String token = extractToken(authorizationHeader);
-        JwtParserBuilder jwtParserBuilder = Jwts.parserBuilder();
-        jwtParserBuilder.setSigningKey(Keys.hmacShaKeyFor(secretKey.getBytes()));
-        Jws<Claims> jws = jwtParserBuilder.build().parseClaimsJws(token);
-        Claims claims = jws.getBody();
-
-        if (claims
-                .getExpiration()
-                .before(
-                        Date.from(LocalDateTime.now().toInstant(ZoneOffset.UTC))
-                )
-        ) {
-            throw new ExpiredJwtException(jws.getHeader(), jws.getBody(), "JWT token is expired");
-        }
-
-        return claims;
-    }
-
-    private String extractToken(String authorizationHeader) {
-
-        return authorizationHeader.replace("Bearer ", "");
     }
 
     private String generateAccessToken(Claims claims) {
 
         return Jwts.builder()
                 .setClaims(claims)
-                .setExpiration(Date.valueOf(LocalDate.now().plusDays(1))) // claim expDate
-                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes())) //signature
+                .setExpiration(Date.valueOf(LocalDate.now().plusDays(1)))
+                .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
                 .compact();
     }
 
