@@ -17,7 +17,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Date;
+import java.time.Instant;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -65,7 +68,7 @@ public class JwtUsernamePasswordAuthFilter extends AbstractAuthenticationProcess
 //
 //        response.addHeader("Authorization", "Bearer " + accessToken);
 //        response.addHeader("Authorization", "Bearer " + refreshToken);
-        generateBody( response,authResult);
+        generateBody(response, authResult);
 
 
     }
@@ -82,20 +85,25 @@ public class JwtUsernamePasswordAuthFilter extends AbstractAuthenticationProcess
 
 
     private String generateAccessToken(Authentication authResult) {
+        Instant issuedAt = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        Instant expiration = issuedAt.plus(1, ChronoUnit.DAYS);
 
         return Jwts.builder()
                 .setSubject(authResult.getName()) //claim sub
                 .claim("auth", authResult.getAuthorities()) // claim auth
-                .setExpiration(Date.valueOf(LocalDate.now().plusDays(1))) // claim expDate
+                .setExpiration(Date.from(expiration)) // claim expDate
                 .signWith(Keys.hmacShaKeyFor(secretKey.getBytes())) //signature
                 .compact();
     }
 
     private String generateRefreshToken(Authentication authResult) {
+        Instant issuedAt = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        Instant expiration = issuedAt.plus(7, ChronoUnit.DAYS);
 
         return Jwts.builder()
                 .setSubject(authResult.getName())
-                .setExpiration(Date.valueOf(LocalDate.now().plusWeeks(1)))
+                .claim("auth", authResult.getAuthorities())
+                .setExpiration(Date.from(expiration))
                 .signWith(Keys.hmacShaKeyFor(secretKey.getBytes()))
                 .compact();
     }

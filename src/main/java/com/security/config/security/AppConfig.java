@@ -5,6 +5,7 @@ import com.security.config.security.jwt.filter.JwtTokenValidator;
 import com.security.config.security.jwt.filter.JwtUsernamePasswordAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
@@ -24,7 +25,7 @@ import static com.security.UserRoles.USER;
 /* до  02.21.2022 (v5.7.0-M2)  */
 @Configuration
 @EnableWebSecurity
-//@EnableGlobalMethodSecurity(prePostEnabled = true) // ???
+@EnableGlobalMethodSecurity(prePostEnabled = true) // ???
 public class AppConfig extends WebSecurityConfigurerAdapter {
 
 
